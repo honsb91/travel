@@ -1,18 +1,25 @@
 package com.honsb.travel.service;
 
+import com.honsb.travel.domain.dto.UserCntDto;
 import com.honsb.travel.domain.dto.UserDto;
 import com.honsb.travel.domain.dto.UserJoinRequest;
+import com.honsb.travel.domain.entity.Comment;
+import com.honsb.travel.domain.entity.Like;
 import com.honsb.travel.domain.entity.User;
+import com.honsb.travel.domain.enum_class.UserRole;
 import com.honsb.travel.repository.CommentRepository;
 import com.honsb.travel.repository.LikeRepository;
 import com.honsb.travel.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
 
 import javax.transaction.Transactional;
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -95,5 +102,48 @@ public class UserService {
         }
     }
 
+    @Transactional
+    public Boolean delete(String loginId,String nowPassword){
+        User loginUser = userRepository.findByLoginId(loginId).get();
+
+        if (encoder.matches(nowPassword, loginUser.getPassword())){
+            List<Like> likes = likeRepository.findAllByUserLoginId(loginId);
+            for (Like like : likes){
+                like.getBoard().likeChange(like.getBoard().getLikeCnt() -1);
+            }
+
+            List<Comment> comments = commentRepository.findAllByUserLoginId(loginId);
+            for (Comment comment : comments){
+                comment.getBoard().commentChange(comment.getBoard().getCommentCnt() - 1);
+            }
+
+            userRepository.delete(loginUser);
+            return true;
+        }else {
+            return false;
+        }
+    }
+
+    public Page<User> findAllByNickname(String keyword, PageRequest pageRequest){
+        return userRepository.findAllByNicknameContains(keyword,pageRequest);
+    }
+
+    @Transactional
+    public void changeRole(Long userId){
+        User user = userRepository.findById(userId).get();
+        user.changeRole();
+    }
+
+    public UserCntDto getUserCnt(){
+        return UserCntDto.builder()
+                .totalUserCnt(userRepository.count())
+                .totalAdminCnt(userRepository.countAllByUserRole(UserRole.ADMIN))
+                .totalBronzeCnt(userRepository.countAllByUserRole(UserRole.BRONZE))
+                .totalSilverCnt(userRepository.countAllByUserRole(UserRole.SILVER))
+                .totalGoldCnt(userRepository.countAllByUserRole(UserRole.GOLD))
+                .totalBlacklistCnt(userRepository.countAllByUserRole(UserRole.BLACKLIST))
+                .build();
+
+    }
 
 }
