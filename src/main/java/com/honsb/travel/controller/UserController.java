@@ -1,7 +1,9 @@
 package com.honsb.travel.controller;
 
+import com.honsb.travel.domain.dto.UserDto;
 import com.honsb.travel.domain.dto.UserJoinRequest;
 import com.honsb.travel.domain.dto.UserLoginRequest;
+import com.honsb.travel.domain.entity.User;
 import com.honsb.travel.service.BoardService;
 import com.honsb.travel.service.UserService;
 import lombok.RequiredArgsConstructor;
@@ -57,7 +59,50 @@ public class UserController {
 
     @GetMapping("/myPage/{category}")
     public String myPage(@PathVariable String category, Authentication auth, Model model){
-        model.addAttribute("boards", boardService.find)
+        model.addAttribute("boards", boardService.findMyBoard(category, auth.getName()));
+        model.addAttribute("category",category);
+        model.addAttribute("user",userService.myInfo(auth.getName()));
+        return "users/myPage";
+    }
+
+    @GetMapping("/edit")
+    public String userEditPage(Authentication auth, Model model){
+        User user = userService.myInfo(auth.getName());
+        model.addAttribute("userDto", UserDto.of(user));
+        return "users/edit";
+    }
+
+    @PostMapping("/edit")
+    public String userEdit(@Valid @ModelAttribute UserDto dto,BindingResult bindingResult,
+                           Authentication auth,Model model){
+
+        // Validation
+        if (userService.editValid(dto, bindingResult, auth.getName()).hasErrors()){
+            return "users/edit";
+        }
+
+        userService.edit(dto, auth.getName());
+
+        model.addAttribute("message","정보가 수정되었습니다.");
+        model.addAttribute("nextUrl","/users/myPage/board");
+        return "printMessage";
+    }
+
+    @GetMapping("/delete")
+    public String userDeletePage(Authentication auth, Model model){
+        User user = userService.myInfo(auth.getName());
+        model.addAttribute("userDto",UserDto.of(user));
+        return "users/delete";
+    }
+
+    @PostMapping("/delete")
+    public String userDelete(@ModelAttribute UserDto dto, Authentication auth, Model model){
+        Boolean deleteSuccess = userService.delete(auth.getName(), dto.getNowPassword());
+        if (deleteSuccess){
+            model.addAttribute("message","탈퇴 되었습니다.");
+            model.addAttribute("nextUrl","/users/logout");
+            return "printMessage";
+        }
     }
 
 }

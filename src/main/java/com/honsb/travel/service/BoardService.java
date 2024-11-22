@@ -1,7 +1,10 @@
 package com.honsb.travel.service;
 
+import com.honsb.travel.domain.dto.BoardCreateRequest;
 import com.honsb.travel.domain.dto.BoardDto;
 import com.honsb.travel.domain.entity.Board;
+import com.honsb.travel.domain.entity.UploadImage;
+import com.honsb.travel.domain.entity.User;
 import com.honsb.travel.domain.enum_class.BoardCategory;
 import com.honsb.travel.domain.enum_class.UserRole;
 import com.honsb.travel.repository.BoardRepository;
@@ -11,9 +14,11 @@ import com.honsb.travel.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
+import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
 
@@ -53,5 +58,11 @@ public class BoardService {
     }
 
     @Transactional
-    public Long writeBoard(BoardCreateRequest)
+    public Long writeBoard(BoardCreateRequest req, BoardCategory category, String loginId, Authentication auth) throws IOException{
+        User loginUser = userRepository.findByLoginId(loginId).get();
+
+        Board savedBoard = boardRepository.save(req.toEntity(category, loginUser));
+
+        UploadImage uploadImage = s3UploadService.save
+    }
 }
