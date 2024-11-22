@@ -30,6 +30,10 @@ public class BoardDto {
                 .userNickname(board.getUser().getNickname())
                 .title(board.getTitle())
                 .body(board.getBody())
-                .createdAt(board.getCrea)
+                .createdAt(board.getCreatedAt())
+                .lastModifiedAt(board.getLastModifiedAt())
+                .likeCnt(board.getLikes().size())
+                .uploadImage(board.getUploadImage())
+                .build();
     }
 }
