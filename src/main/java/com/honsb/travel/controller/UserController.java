@@ -7,6 +7,9 @@ import com.honsb.travel.domain.entity.User;
 import com.honsb.travel.service.BoardService;
 import com.honsb.travel.service.UserService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -15,6 +18,8 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
 
 @Controller
 @RequiredArgsConstructor
@@ -102,7 +107,32 @@ public class UserController {
             model.addAttribute("message","탈퇴 되었습니다.");
             model.addAttribute("nextUrl","/users/logout");
             return "printMessage";
+        }else{
+            model.addAttribute("message","현재 비밀번호가 틀려 탈퇴에 실패하였습니다.");
+            model.addAttribute("nextUrl","/users/delete");
+            return "printMessage";
         }
+    }
+
+    @GetMapping("/admin")
+    public String adminPage(@RequestParam(required = false, defaultValue = "1") int page,
+                            @RequestParam(required = false, defaultValue = "") String keyword,
+                            Model model){
+
+        PageRequest pageRequest = PageRequest.of(page - 1, 10, Sort.by("id").descending());
+        Page<User> users = userService.findAllByNickname(keyword, pageRequest);
+
+        model.addAttribute("users",users);
+        model.addAttribute("keyword",keyword);
+        return "users/admin";
+    }
+
+    @GetMapping("/admin/{userId}")
+    public String adminChangRole(@PathVariable Long userId,
+                                 @RequestParam(required = false, defaultValue = "1") int page,
+                                 @RequestParam(required = false, defaultValue = "") String keyword) throws UnsupportedEncodingException{
+        userService.changeRole(userId);
+        return "redirect:/users/admin?page=" + page + "&keyword=" + URLEncoder.encode(keyword, "UTF-8");
     }
 
 }
