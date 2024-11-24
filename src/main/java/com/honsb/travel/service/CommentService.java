@@ -1,5 +1,6 @@
 package com.honsb.travel.service;
 
+import com.honsb.travel.domain.dto.CommentCreateRequest;
 import com.honsb.travel.domain.entity.Board;
 import com.honsb.travel.domain.entity.Comment;
 import com.honsb.travel.domain.entity.User;
