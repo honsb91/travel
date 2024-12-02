@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head th:replace="fragments/header.html :: head" />
+<body>
+<div th:replace="fragments/header.html :: header (${category})" />
+<div class="row" style="margin-bottom: 30px">
+  <div class="offset-1 col-2">
+    <h5 style="height: 40px; display: flex; align-items: center; margin: 0px; justify-content: right">전체: [[${boards.getTotalElements()}]]개</h5>
+  </div>
+  <div class="col-6" align="center">
+    <form class="form-group" style="height: 40px; th:object=${boardSearchRequest}" th:method="get"
+          th:action="|@{/boards/{category} (category=${category}, sortType=*{sortType}, searchType=*{searchType}, keyword=*{keyword})}|">
+      <select th:field="*{sortType}" style="height: 40px;">
+        <option th:value="date">최신순</option>
+        <option th:value="like">좋아요순</option>
+        <option th:value="comment">댓글순</option>
+      </select>
+      <select th:field="${searchType}" style="height: 40px;">
+        <option th:value="title">제목</option>
+        <option th:value="nickname">작성자</option>
+      </select>
+      <input type="text" th:field="*{keyword}" placeholder="검색 키워드를 입력해주세요." style="height: 100%; width: 60%;">
+      <button class="btn search-btn" type="submit">검색</button>
+    </form>
+  </div>
+
+</div>
+</body>
+</html>
