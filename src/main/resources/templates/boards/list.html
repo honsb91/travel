@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="ko" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 <head th:replace="fragments/header.html :: head" />
+<meta charset="UTF-8">
 <body>
 <div th:replace="fragments/header.html :: header (${category})" />
 <div class="row" style="margin-bottom: 30px">
@@ -65,5 +66,69 @@
   </div>
   <ul id="paging-ul" class="pagination justify-content-center"></ul>
 </div>
+<script th:inline="javascript">
+    window.onload = function (){
+      let nowPage = [[${boards.getNumber()}]] + 1;
+      let totalPage = [[${boards.getTotalPages()}]];
+
+      let firstPage;
+      for(let i = nowPage ; i >=1; i--){
+        if(i % 5 == 1){
+          firstPage = i;
+          break;
+        }
+      }
+
+      let lastPage;
+      let nextButton;
+      if(firstPage + 4 >= totalPage){
+        lagePage = totalPage;
+        nextButton = false;
+      }else{
+        lastPage = firstPage + 4;
+        nextButton = true;
+      }
+
+      let pageHtml = "";
+      pageHtml += "<li><a class='page-link' href='" + makeUrl(1) + "'>&laquo;</a></li>";
+      if(firstPage != 1){
+        pageHtml += "<li><a class='page-link' href='" + makeUrl(firstPage - 1) + "'>&lsaquo;</a></li>";
+      }
+
+      for(let i = firstPage; i<= lastPage; i++){
+        if(i == nowPage){
+          pageHtml += "<li class='page-item active'><a class= 'page-link'>" + i + "</a></li>";
+        }else{
+          pageHtml += "<li class='page-item'><a class= 'page-link' href='" + makeUrl(i) + "'>" + i + "</a></li>";
+        }
+      }
+
+      if(nextButton){
+        pageHtml += "<li><a class='page-link' href='" + makeUrl(lastPage + 1) + "'>&rsaquo;</a></li>";
+      }
+      pageHtml += "<li><a class='page-link' href='" + makeUrl(totalPage) + "'>&raquo;</a></li>";
+
+      $("#paging-ul").html(pageHtml);
+    }
+
+    function makeUrl(page){
+      let category = [[${category}]];
+      let url = "/boards/" + category + "?page=" + page;
+
+      let sortType = [[${boardSearchRequest.sortType}]];
+      let searchType = [[${boardSearchRequest.searchType}]];
+      let keyword = [[${boardSearchRequest.keyword}]];
+
+      if(sortType != null){
+        url += "&sortType=" + sortType;
+      }
+      if(searchType != null){
+        url += "&searchType=" + searchType + "&keyword=" + keyword;
+      }
+
+      return url;
+    }
+
+</script>
 </body>
 </html>
