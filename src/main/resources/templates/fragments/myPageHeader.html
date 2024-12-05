@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<meta charset="UTF-8">
+<body>
+  <div th:fragment="myPageHeader" class="row">
+      <div class="offset-3 col-6">
+        <div class="card">
+          <div class="card-body">
+            <div style="float: left">
+              <h4>Id: [[${user.loginId}]]</h4>
+              <h4>닉네임: [[${user.nickname}]]</h4>
+              <h4>등급: [[${user.userRole}]]</h4>
+              <h4>받은 좋아요: [[${user.receivedLikeCnt}]]개</h4>
+            </div>
+            <div style="float: right">
+              <button class="btn edit-btn" onclick="location.href='/users/edit'">정보수정</button>
+              <br/><br/>
+              <button clas="btn del-btn" onclick="location.href='/users/delete'">회원탈퇴</button>
+            </div>
+          </div>
+        </div>
+      </div>
+  </div>
+</body>
+</html>
