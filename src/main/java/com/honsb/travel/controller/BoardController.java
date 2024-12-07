@@ -2,8 +2,13 @@ package com.honsb.travel.controller;
 
 import com.honsb.travel.domain.dto.BoardCreateRequest;
 import com.honsb.travel.domain.dto.BoardDto;
+import com.honsb.travel.domain.dto.BoardSearchRequest;
+import com.honsb.travel.domain.dto.CommentCreateRequest;
 import com.honsb.travel.domain.enum_class.BoardCategory;
 import com.honsb.travel.service.BoardService;
+import com.honsb.travel.service.CommentService;
+import com.honsb.travel.service.LikeService;
+import com.honsb.travel.service.UploadImageService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.UrlResource;
